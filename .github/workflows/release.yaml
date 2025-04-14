@@ -37,7 +37,7 @@ jobs:
         run: cargo build --release
 
       - name: Bump patch version
-        run: cargo bump minor
+        run: cargo bump patch
 
       - name: Commit bumped version
         run: |
