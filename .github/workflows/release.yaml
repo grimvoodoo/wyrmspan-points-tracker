@@ -1,0 +1,53 @@
+name: Release and Publish Container
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "**/*.rs"
+      - "Cargo.toml"
+      - "Dockerfile"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Get current version
+        id: version
+        run: echo "version=$(cargo metadata --no-deps --format-version=1 | jq -r '.packages[0].version')" >> $GITHUB_OUTPUT
+
+      - name: Build Release
+        run: cargo build --release
+
+      - name: Bump patch version
+        run: cargo set-version --bump-patch
+
+      - name: Commit bumped version
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git commit -am "Bump version"
+          git push
+
+      - name: Docker Login
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+
+      - name: Build Image
+        run: docker build -t ghcr.io/${{ github.repository_owner }}/wyrmspan-points-tracker:${{ steps.version.outputs.version }} .
+
+      - name: Push Image
+        run: docker push ghcr.io/${{ github.repository_owner }}/wyrmspan-points-tracker:${{ steps.version.outputs.version }}
