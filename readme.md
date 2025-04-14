@@ -24,7 +24,7 @@ or podman
 podman run -p 3000:3000 wrymspan-score-tracker:1.0.0
 ```
 
-That will start the webserver which can then be accessed through port 3000 on your [local machine](http://127.0.0.1:3000)
+That will start the webserver, which can then be accessed through port 3000 on your [local machine](http://127.0.0.1:3000)
 
 ## Not Affiliated With Stonemaier Games
 
