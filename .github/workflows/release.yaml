@@ -50,7 +50,12 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
 
       - name: Build Image
-        run: docker build -t ghcr.io/${{ github.repository_owner }}/wyrmspan-points-tracker:${{ steps.version.outputs.version }} .
+        run:
+          docker build -t ghcr.io/${{ github.repository_owner }}/wyrmspan-points-tracker:${{ steps.version.outputs.version }} .
+          docker tag ghcr.io/${{ github.repository_owner }}/wyrmspan-points-tracker:${{ steps.version.outputs.version }} \
+          ghcr.io/${{ github.repository_owner }}/wyrmspan-points-tracker:latest
 
       - name: Push Image
-        run: docker push ghcr.io/${{ github.repository_owner }}/wyrmspan-points-tracker:${{ steps.version.outputs.version }}
+        run:
+          docker push ghcr.io/${{ github.repository_owner }}/wyrmspan-points-tracker:${{ steps.version.outputs.version }}
+          docker push ghcr.io/${{ github.repository_owner }}/wyrmspan-points-tracker:latest
