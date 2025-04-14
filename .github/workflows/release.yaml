@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "**/*.rs"
-      - "Cargo.toml"
-      - "Dockerfile"
 
 jobs:
   release:
