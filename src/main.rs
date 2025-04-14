@@ -13,7 +13,6 @@ use axum::{
 use serde::Deserialize;
 use tower_http::services::ServeDir;
 
-// Define a simple struct for a score entry
 struct ScoreEntry {
     username: String,
     total: u32,
