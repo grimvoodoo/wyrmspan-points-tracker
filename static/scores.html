@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Wyrmspan Score Tracker</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="content">
+      <h1>Top Scores</h1>
+      <table>
+        <tr>
+          <th>Username</th>
+          <th>Score</th>
+        </tr>
+        <!-- {{SCORE_ROWS}} -->
+        </tr>
+      </table>
+
+      <hr style="margin: 30px 0; border: none; border-top: 1px solid #ccc" />
+
+      <h2>Submit a New Score</h2>
+      <form id="score-form" onsubmit="handleSubmit(event)" novalidate>
+        <div id="players-container">
+            <!-- Player blocks will be inserted here -->
+        </div>
+    
+        <div class="form-row" style="text-align: center;">
+            <button type="button" id="add-player">➕ Add Player</button>
+        </div>
+    
+        <div class="form-row">
+            <button type="submit">Submit Scores</button>
+        </div>
+    </form>
+    </div>
+
+    <script>
+      function updateTotal() {
+        const ids = [
+          "guild",
+          "points",
+          "endgame",
+          "eggs",
+          "resources",
+          "tucked",
+          "objectives",
+          "excess",
+        ];
+        let total = 0;
+        for (let id of ids) {
+          const val = parseInt(document.getElementById(id).value);
+          if (!isNaN(val) && val >= 0) {
+            total += val;
+          }
+        }
+        document.getElementById("total").textContent = total;
+      }
+    </script>
+  </body>
+  <script>
+    const maxPlayers = 5;
+    let playerCount = 0;
+    
+    const scoreFields = [
+        { id: "guild", label: "Dragon Guild Markers" },
+        { id: "points", label: "Dragon Points" },
+        { id: "endgame", label: "End Game Abilities" },
+        { id: "eggs", label: "Eggs" },
+        { id: "resources", label: "Cached Resources" },
+        { id: "tucked", label: "Tucked Cards" },
+        { id: "objectives", label: "Public Objectives" },
+        { id: "excess", label: "Excess Items & Coins" }
+    ];
+    
+    function createPlayerBlock(index) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "player-block";
+        wrapper.setAttribute("data-player", index);
+    
+        let html = `
+            <h3>Player ${index + 1}</h3>
+            <div class="form-row">
+                <label for="player-${index}-name">Name:</label>
+                <input type="text" id="player-${index}-name" required>
+            </div>
+        `;
+    
+        scoreFields.forEach(field => {
+            html += `
+            <div class="form-row">
+                <label>${field.label}:
+                    <input type="number" id="player-${index}-${field.id}" min="0">
+                </label>
+            </div>`;
+        });
+    
+        html += `
+            <div class="form-row total">
+                Total Score: <span id="player-${index}-total">0</span>
+            </div>
+            <hr>
+        `;
+    
+        wrapper.innerHTML = html;
+        return wrapper;
+    }
+    
+    function updatePlayerTotals() {
+        for (let i = 0; i < playerCount; i++) {
+            let total = 0;
+            scoreFields.forEach(field => {
+                const input = document.getElementById(`player-${i}-${field.id}`);
+                if (input) {
+                    const val = parseInt(input.value);
+                    if (!isNaN(val) && val >= 0) {
+                        total += val;
+                    }
+                }
+            });
+            const totalSpan = document.getElementById(`player-${i}-total`);
+            if (totalSpan) totalSpan.textContent = total;
+        }
+    }
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        const container = document.getElementById("players-container");
+        const addBtn = document.getElementById("add-player");
+    
+        function addPlayer() {
+            if (playerCount >= maxPlayers) return;
+            const block = createPlayerBlock(playerCount);
+            container.appendChild(block);
+            playerCount++;
+            updatePlayerTotals(); // run once initially
+    
+            // Attach input listeners
+            scoreFields.forEach(field => {
+                const input = document.getElementById(`player-${playerCount - 1}-${field.id}`);
+                if (input) {
+                    input.addEventListener("input", updatePlayerTotals);
+                    input.addEventListener("keydown", handleEnterToNextField);
+                }
+            });
+            const nameInput = document.getElementById(`player-${playerCount - 1}-name`);
+            nameInput?.addEventListener("keydown", handleEnterToNextField);
+        }
+    
+        function handleEnterToNextField(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                const inputs = Array.from(document.querySelectorAll("input"));
+                const idx = inputs.indexOf(e.target);
+                if (idx !== -1 && inputs[idx + 1]) {
+                    inputs[idx + 1].focus();
+                }
+            }
+        }
+    
+        addBtn.addEventListener("click", addPlayer);
+        addPlayer(); // add the first player by default
+    });
+    </script>
+    <script>
+      async function handleSubmit(e) {
+          e.preventDefault();
+      
+          const players = [];
+          for (let i = 0; i < playerCount; i++) {
+              const name = document.getElementById(`player-${i}-name`).value.trim();
+              if (!name) continue;
+      
+              const total = parseInt(document.getElementById(`player-${i}-total`).textContent);
+              if (!isNaN(total)) {
+                  players.push({ name, total });
+              }
+          }
+      
+          if (players.length === 0) {
+              alert("Please enter at least one valid player.");
+              return;
+          }
+      
+          const response = await fetch("/submit", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json"
+              },
+              body: JSON.stringify(players)
+          });
+      
+          if (response.ok) {
+              alert("Scores submitted!");
+              window.location.reload(); // refresh to show updated scores
+          } else {
+              alert("Something went wrong submitting scores.");
+          }
+      }
+      </script>
+    
+</html>

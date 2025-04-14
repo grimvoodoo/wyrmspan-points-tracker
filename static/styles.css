@@ -1,0 +1,150 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Georgia", serif;
+  background: black;
+  color: #333;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: url("/static/ai-generated-background.png") no-repeat center center
+    fixed;
+  background-size: cover;
+  opacity: 0.25;
+  z-index: -1;
+}
+
+.content {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  max-width: 90%;
+  width: 500px;
+  margin: 3% auto;
+  padding: 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  transition: width 0.2s ease, margin 0.2s ease;
+}
+
+h1 {
+  margin-bottom: 15px;
+  font-size: 1.6rem;
+  color: #4a2f2f;
+}
+
+h2 {
+  margin-top: 30px;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+  color: #4a2f2f;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  margin-top: 10px;
+}
+
+th,
+td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #bbb;
+  text-align: left;
+}
+
+th {
+  background-color: #eaeaea;
+}
+
+form {
+  margin-top: 20px;
+  text-align: left;
+}
+
+.form-row {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+input[type="text"],
+input[type="number"] {
+  padding: 6px 8px;
+  font-size: 1rem;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.total {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+button {
+  padding: 8px 14px;
+  font-size: 1rem;
+  background-color: #4a2f2f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #6d4444;
+}
+
+@media (max-width: 600px) {
+  .content {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    border-radius: 0;
+    padding: 15px;
+  }
+
+  h1,
+  h2 {
+    font-size: 1.2rem;
+  }
+
+  table {
+    font-size: 0.9rem;
+  }
+
+  th,
+  td {
+    padding: 5px 6px;
+  }
+
+  input[type="text"],
+  input[type="number"] {
+    font-size: 0.95rem;
+  }
+}
+
+.player-block {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+}
