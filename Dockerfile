@@ -11,7 +11,7 @@ WORKDIR /app
 COPY target/release/wyrmspan-points-tracker /app/wyrmspan-points-tracker
 
 # Copy the data file(s)
-COPY scores.txt /app/scores.txt
+COPY /data/scores.txt /app/data/scores.txt
 
 # copy html and css
 COPY static /app/static/
