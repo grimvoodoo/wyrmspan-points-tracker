@@ -54,6 +54,4 @@ jobs:
         run: docker build -t ghcr.io/${{ github.repository_owner }}/wyrmspan-points-tracker:${{ steps.version.outputs.version }} -t ghcr.io/${{ github.repository_owner }}/wyrmspan-points-tracker:latest .
 
       - name: Push Image
-        run:
-          docker push ghcr.io/${{ github.repository_owner }}/wyrmspan-points-tracker:${{ steps.version.outputs.version }}
-          docker push ghcr.io/${{ github.repository_owner }}/wyrmspan-points-tracker:latest
+        run: docker push -a ghcr.io/${{ github.repository_owner }}/wyrmspan-points-tracker
