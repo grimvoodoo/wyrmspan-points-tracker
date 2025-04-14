@@ -26,15 +26,15 @@ podman run -p 3000:3000 ghcr.io/grimvoodoo/wyrmspan-points-tracker:latest
 
 That will start the webserver, which can then be accessed through port 3000 on your [local machine](http://127.0.0.1:3000)
 
-## Not Affiliated With Stonemaier Games
-
-This is a fan-made project for tracking scores in _Wyrmspan_. It’s not an official product and has no association with Stonemaier Games — I’m just a fan who wanted a digital score tracker!
-
-All rights to _Wyrmspan_ and related content belong to Stonemaier Games.
-
 ## Future plans
 
 I have used this tracker a few times and have some ideas for how to improve it.
 
 - I want to add the ability to show the results of the most recent game below the high scores list
 - I want to add collapseable sections to hide parts like the high scores that people may not care about.
+
+## Not Affiliated With Stonemaier Games
+
+This is a fan-made project for tracking scores in _Wyrmspan_. It’s not an official product and has no association with Stonemaier Games — I’m just a fan who wanted a digital score tracker!
+
+All rights to _Wyrmspan_ and related content belong to Stonemaier Games.
