@@ -26,4 +26,4 @@ USER appuser
 EXPOSE 3000
 
 # Set the entrypoint
-CMD ["/app/./wyrmspan-points-tracker"]
+CMD ["/app/wyrmspan-points-tracker"]
