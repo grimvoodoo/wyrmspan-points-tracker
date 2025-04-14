@@ -15,13 +15,13 @@ The top 5 scores will be displayed at the top of the screen for everyone to see.
 I have created a container which is located in the releases of this github repo. You can deploy that with the following command with docker:
 
 ```bash
-docker run -p 3000:3000 wrymspan-score-tracker:1.0.0
+docker run -p 3000:3000 ghcr.io/grimvoodoo/wyrmspan-points-tracker:latest
 ```
 
 or podman
 
 ```bash
-podman run -p 3000:3000 wrymspan-score-tracker:1.0.0
+podman run -p 3000:3000 ghcr.io/grimvoodoo/wyrmspan-points-tracker:latest
 ```
 
 That will start the webserver, which can then be accessed through port 3000 on your [local machine](http://127.0.0.1:3000)
