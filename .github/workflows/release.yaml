@@ -30,11 +30,14 @@ jobs:
         id: version
         run: echo "version=$(cargo metadata --no-deps --format-version=1 | jq -r '.packages[0].version')" >> $GITHUB_OUTPUT
 
+      - name: install cargo bump
+        run: cargo install cargo-bump
+
       - name: Build Release
         run: cargo build --release
 
       - name: Bump patch version
-        run: cargo set-version --bump-patch
+        run: cargo bump minor
 
       - name: Commit bumped version
         run: |
