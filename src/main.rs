@@ -1,6 +1,8 @@
 use std::{
+    env,
     fs::{self, OpenOptions},
     io::Write,
+    path::PathBuf,
 };
 
 use axum::{
@@ -24,6 +26,11 @@ struct SubmittedPlayer {
     total: u32,
 }
 
+fn get_scores_file_path() -> PathBuf {
+    let data_dir = env::var("DATA_DIR").unwrap_or_else(|_| "/data".to_string());
+    PathBuf::from(data_dir).join("scores.txt")
+}
+
 #[tokio::main]
 async fn main() {
     // build our application with a single route
@@ -40,7 +47,8 @@ async fn main() {
 
 fn get_top_scores() -> Vec<ScoreEntry> {
     let mut scores = Vec::new();
-    if let Ok(contents) = fs::read_to_string("data/scores.txt") {
+    let scores_path = get_scores_file_path();
+    if let Ok(contents) = fs::read_to_string(&scores_path) {
         for line in contents.lines() {
             if let Some((name, score_str)) = line.split_once(":") {
                 if let Ok(total) = score_str.trim().parse::<u32>() {
@@ -72,11 +80,12 @@ async fn show_scores() -> Html<String> {
 }
 
 async fn submit_scores(Json(payload): Json<Vec<SubmittedPlayer>>) -> &'static str {
+    let scores_path = get_scores_file_path();
     let mut file = OpenOptions::new()
         .create(true)
         .append(true)
-        .open("data/scores.txt")
-        .expect("Unable to open file 'data/scores.txt");
+        .open(&scores_path)
+        .unwrap_or_else(|_| panic!("Unable to open file '{}'", scores_path.display()));
 
     for player in payload {
         if !player.name.trim().is_empty() {

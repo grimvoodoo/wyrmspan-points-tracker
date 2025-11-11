@@ -10,14 +10,14 @@ WORKDIR /app
 # Copy the built binary from your local machine
 COPY target/release/wyrmspan-points-tracker /app/wyrmspan-points-tracker
 
-# Copy the data file(s)
-COPY /data/scores.txt /app/data/scores.txt
-
 # copy html and css
 COPY static /app/static/
 
+# Create /data directory and initialize with empty scores file
+RUN mkdir -p /data && touch /data/scores.txt
+
 # Set file permissions (optional but good practice)
-RUN chown -R appuser:appuser /app
+RUN chown -R appuser:appuser /app && chown -R appuser:appuser /data
 
 # Switch to non-root user
 USER appuser
