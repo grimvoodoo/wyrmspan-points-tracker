@@ -7,10 +7,11 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 Wyrmspan Points Tracker is a web application for tracking scores in the board game _Wyrmspan_. It's built with Rust using the Axum web framework and serves a single-page application with a simple score submission and leaderboard system.
 
 **Key characteristics:**
-- Minimal Rust web server with only 91 lines of code in `src/main.rs`
-- Stateless backend - all data persists to `/data/scores.txt` in simple `name: score` format
+- Minimal Rust web server with ~95 lines of code in `src/main.rs`
+- Stateless backend - all data persists to `scores.txt` in configurable directory (defaults to `/data`)
+- Data directory configurable via `DATA_DIR` environment variable
 - Static frontend (HTML/CSS/JS) served from `/static`
-- Designed for containerized deployment (Docker/Podman) with mountable `/data` volume
+- Designed for containerized deployment (Docker/Podman) with mountable data volume
 - Single-page app accessed via web browser (typically on phones/tablets during gameplay)
 
 ## Architecture
@@ -18,10 +19,11 @@ Wyrmspan Points Tracker is a web application for tracking scores in the board ga
 ### Backend (Rust/Axum)
 - **Entry point:** `src/main.rs` - contains entire backend logic
 - **Routes:**
-  - `GET /` - Reads top 5 scores from `/data/scores.txt`, injects into HTML template, returns rendered page
+  - `GET /` - Reads top 5 scores from `${DATA_DIR}/scores.txt`, injects into HTML template, returns rendered page
   - `POST /submit` - Accepts JSON array of `{name, total}` objects, appends to scores file
   - `/static/*` - Serves static assets via tower-http
-- **Data storage:** Flat file at `/data/scores.txt` with format `PlayerName: score` (one per line)
+- **Data storage:** Flat file at `${DATA_DIR}/scores.txt` with format `PlayerName: score` (one per line)
+- **Configuration:** Data directory set via `DATA_DIR` environment variable (defaults to `/data`)
 - **Score processing:** In-memory sorting on read, keeps top 5 only for display
 
 ### Frontend (Static HTML/CSS/JS)
@@ -30,9 +32,10 @@ Wyrmspan Points Tracker is a web application for tracking scores in the board ga
 - **`static/ai-generated-background.png`** - Background image
 
 ### Data Flow
-1. User requests `/` → Backend reads `/data/scores.txt` → Sorts and gets top 5 → Injects into HTML template → Returns page
-2. User submits scores → Frontend POSTs JSON to `/submit` → Backend appends to `/data/scores.txt`
+1. User requests `/` → Backend reads `${DATA_DIR}/scores.txt` → Sorts and gets top 5 → Injects into HTML template → Returns page
+2. User submits scores → Frontend POSTs JSON to `/submit` → Backend appends to `${DATA_DIR}/scores.txt`
 3. No database, no sessions - purely file-based persistence
+4. Data directory location is read from `DATA_DIR` environment variable (defaults to `/data`)
 
 ## Common Commands
 
@@ -78,6 +81,9 @@ docker run -p 3000:3000 wyrmspan-points-tracker:local
 # Run container with persistent storage (recommended)
 docker run -p 3000:3000 -v /path/to/host/data:/data wyrmspan-points-tracker:local
 
+# Run container with custom data directory
+docker run -p 3000:3000 -e DATA_DIR=/custom/path -v /path/to/host/data:/custom/path wyrmspan-points-tracker:local
+
 # Or with Podman
 podman build -t wyrmspan-points-tracker:local .
 podman run -p 3000:3000 -v /path/to/host/data:/data wyrmspan-points-tracker:local
@@ -92,7 +98,8 @@ docker run -p 3000:3000 -v /path/to/host/data:/data ghcr.io/grimvoodoo/wyrmspan-
 
 1. **Backend changes:** Edit `src/main.rs` directly - all server logic is in this single file
 2. **Frontend changes:** Edit files in `static/` directory
-3. **Data format changes:** Modify `/data/scores.txt` parsing/writing logic in `get_top_scores()` and `submit_scores()` functions
+3. **Data format changes:** Modify `scores.txt` parsing/writing logic in `get_top_scores()` and `submit_scores()` functions
+4. **Configuration changes:** Data directory is controlled by `get_scores_file_path()` function which reads `DATA_DIR` env var
 
 ### Release Process
 
@@ -107,12 +114,17 @@ docker run -p 3000:3000 -v /path/to/host/data:/data ghcr.io/grimvoodoo/wyrmspan-
 
 ### File Structure Notes
 
-- `/data` directory is used for persistent storage and can be mounted as a volume
+- Data directory defaults to `/data` but can be overridden with `DATA_DIR` environment variable
 - `scores-mine.txt` is gitignored (for local testing without affecting production scores)
-- Local `data/` directory is no longer used by the application
 - Container creates `/data/scores.txt` with empty initial state
 - Container runs as non-root user `appuser` for security
 - Application listens on `0.0.0.0:3000` (container exposes port 3000)
+
+### Environment Variables
+
+- **`DATA_DIR`** - Directory where `scores.txt` will be stored (default: `/data`)
+  - Example: `DATA_DIR=/custom/path` will store scores at `/custom/path/scores.txt`
+  - Useful for development or custom deployment scenarios
 
 ## Key Implementation Details
 
