@@ -40,7 +40,7 @@ async fn main() {
 
 fn get_top_scores() -> Vec<ScoreEntry> {
     let mut scores = Vec::new();
-    if let Ok(contents) = fs::read_to_string("data/scores.txt") {
+    if let Ok(contents) = fs::read_to_string("/data/scores.txt") {
         for line in contents.lines() {
             if let Some((name, score_str)) = line.split_once(":") {
                 if let Ok(total) = score_str.trim().parse::<u32>() {
@@ -75,8 +75,8 @@ async fn submit_scores(Json(payload): Json<Vec<SubmittedPlayer>>) -> &'static st
     let mut file = OpenOptions::new()
         .create(true)
         .append(true)
-        .open("data/scores.txt")
-        .expect("Unable to open file 'data/scores.txt");
+        .open("/data/scores.txt")
+        .expect("Unable to open file '/data/scores.txt'");
 
     for player in payload {
         if !player.name.trim().is_empty() {
